@@ -828,7 +828,11 @@ def stable_match(students, rooms):
 
     return s_matches
 
-
+def maximum_weight_bipartite_matching(students, rooms):
+    """ This function takes in the room and student data and 
+    returns a maximum-weight bipartite matching of students to rooms. """
+    # Implementation for maximum-weight bipartite matching would go here
+    pass
 def main(students, rooms) -> None:
     start_time = time.perf_counter()
     matches = stable_match(students, rooms)
@@ -848,6 +852,8 @@ def main(students, rooms) -> None:
     for student in sorted(students):  
          if student not in matches:
             print(f"student {student} has no match right now")
+    print("Maximum-weight bipartite matching of Students to Rooms:")
+    # Implementation for maximum-weight bipartite matching would go here
 
 if __name__ == "__main__":
 	main(students, rooms)
