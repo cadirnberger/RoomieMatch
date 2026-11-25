@@ -118,7 +118,46 @@ def maximum_weight_bipartite_matching(students_1, student_2):
             node = parent
     # Create a dictionary of the matches based on the edges that have been used in the flow
     return {student: room for student, room, edge in matching_edges if edge[2] == 0}
-   
+
+def satisfaction_score(matching, students_1, student_2) -> dict:
+    """scores a matching from the student own point of view. 
+ matching maps each student_1 to the student_2 they were given. 
+A student satisfaction is (L - rank) / L where rank is the position 
+of their partner in their own preference list 0 = first choice and L is the length of that list.
+ So 1.0 is their top choice and 1/L is their last choice. Unmatched students score 0."""
+    # score for one student based on where their partner is in their own list
+    def score(prefs, partner):
+        if partner is None or partner not in prefs:
+            return 0.0
+        return (len(prefs) - prefs.index(partner)) / len(prefs)
+    #Flip the matching so we can also look up each student_2 partner
+    partner_of_2 = {room: student for student, room in matching.items()}
+    #A score for every student in each group
+    scores_1 = [score(prefs, matching.get(student)) for student, prefs in students_1.items()]
+    scores_2 = [score(prefs, partner_of_2.get(student)) for student, prefs in student_2.items()]
+    everyone = scores_1 + scores_2
+    # Return the satisfaction scores for both groups and overall
+    return {
+        "students_1": sum(scores_1) / len(scores_1), # average for group 1
+        "student_2": sum(scores_2) / len(scores_2), # average for group 2
+        "overall": sum(everyone) / len(everyone), # average for everyone
+        "worst_off": min(everyone), # least happy student
+        "first_choices": sum(1 for s in everyone if s == 1.0), # how many got their first choice
+        "matched_pairs": len(matching), # how many pairs were made
+    }
+    
+
+def print_satisfaction(name, scores) -> None:
+    """prints the satisfaction score summary for one algorithm."""
+    print(f"{name} satisfaction (1.0 = everyone got their first choice):")
+    print(f" Student 1 average: {scores['students_1']:.3f}")
+    print(f" Student 2 average: {scores['student_2']:.3f}")
+    print(f" Overall average: {scores['overall']:.3f}")
+    print(f" Least satisfied student: {scores['worst_off']:.3f}")
+    print(f" Students who got their first choice: {scores['first_choices']}")
+    print(f" Matched pairs: {scores['matched_pairs']}\n") # \n adds a blank line after
+
+
 def main(students_1, student_2) -> None:
     """Main function that takes in the student data and runs both the stable matching and maximum-weight bipartite matching algorithms, 
     printing the results and their execution times. """
