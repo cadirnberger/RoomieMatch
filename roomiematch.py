@@ -50,7 +50,7 @@ def stable_match(students_1, student_2):
 
 def maximum_weight_bipartite_matching(students_1, student_2):
     """ This function takes in the student data and 
-    returns a maximum-weight bipartite matching of students to student. """
+    returns matches from students_1 IDs to student_2 IDs. """
     left = list(student_2)
     right = list(students_1)
     source = 0
@@ -117,7 +117,7 @@ def maximum_weight_bipartite_matching(students_1, student_2):
             graph[node][edge[1]][2] += 1
             node = parent
     # Create a dictionary of the matches based on the edges that have been used in the flow
-    return {student: room for student, room, edge in matching_edges if edge[2] == 0}
+    return {room: student for student, room, edge in matching_edges if edge[2] == 0}
 
 def satisfaction_score(matching, students_1, student_2) -> dict:
     """scores a matching from the student own point of view. 
@@ -169,8 +169,12 @@ def main(students_1, student_2) -> None:
     ex_time_1 = end_time-start_time
     # Print the results of the stable matching algorithm
     print("Stable Matching of Students:")
-    for student, match in stable.items():
-        print(f"Student {match}: Student {student}")
+    for student_1 in sorted(students_1):
+        match = stable.get(student_1)
+        if match is None:
+            print(f"Student_1 {student_1}: no match")
+        else:
+            print(f"Student_1 {student_1} -> Student_2 {match}")
     print("\n")
     # Run the maximum-weight bipartite matching algorithm and measure its execution time
     print("Maximum-weight bipartite matching of Students:")
@@ -179,13 +183,19 @@ def main(students_1, student_2) -> None:
     end_time = time.perf_counter()
     ex_time_2 = end_time-start_time
     # Print the results of the maximum-weight bipartite matching algorithm
-    for student, match in max_weight.items():
-        print(f"Student {student}: Student {match}")
+    for student_1 in sorted(students_1):
+        match = max_weight.get(student_1)
+        if match is None:
+            print(f"Student_1 {student_1}: no match")
+        else:
+            print(f"Student_1 {student_1} -> Student_2 {match}")
     print("\n")
     # Print the execution times of both algorithms
     print(f" Stable Matching Runtime: {ex_time_1:.6f} seconds\n")
     print(f" Maximum-weight Bipartite Matching Runtime: {ex_time_2:.6f} seconds\n")
-
+    #satifactory scores for both algorithms
+    print_satisfaction("Stable Matching", satisfaction_score(stable, students_1, student_2))
+    print_satisfaction("Maximum-weight Bipartite Matching", satisfaction_score(max_weight, students_1, student_2))
 if __name__ == "__main__":
 	main(students_1, student_2)
          
